@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Windows.Forms;
 using WindowsFormsApp1.Properties;
 
@@ -9,19 +10,37 @@ namespace WindowsFormsApp1
 {
     public partial class MainForm : Form
     {
-        List<UC_Card> cardList = new List<UC_Card>();
-        List<int> sales = new List<int>();
-        public List<AbstractClassSales> abstractClassSales = new List<AbstractClassSales>();
-        private string Sort;
-        private string Cat;
+        List<CardUserControl> cardList = new List<CardUserControl>(); // тут будут храниться карточки из БД
 
-        public MainForm()
+        List<int> sales = new List<int>(); // тут будут храниться айдишники товаров, на которые будут скидки
+
+        public List<AbstractClassSales> abstractClassSales = new List<AbstractClassSales>(); // тут будут храниться карточки, которые юзер добавил в корзину
+
+        private string Cat; // тут будет хранить значение категории
+
+        public int id_user;
+
+
+        //----------------------------------------------------------------------------------------------------
+
+        public MainForm(int id, string user)
         {
             InitializeComponent();
-            labelShowCount.Visible = false;
             refresh();
-            LoadDateCBCat();
+            this.id_user = id;
+            label4.Text = "Здравствуйте, " + user + "!";
+            labelShowCount.Visible = false;
+            buttonOptimusManuTransGaysOformitManuZakaz.Visible = false;
         }
+
+        //----------------------------------------------------------------------------------------------------
+
+
+        //  ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ КОРЗИНА И ОФОРМЛЕНИЕ ЗАКАЗА ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+
+
+
+        // логика циферки рядом с корзиной
         public void CountSales()
         {
             if (abstractClassSales.Count > 0)
@@ -34,27 +53,103 @@ namespace WindowsFormsApp1
                 labelShowCount.Visible = false;
             }
         }
+
+        // метод-обрабочик события при нажатии на кнопку "Открыть корзину"
         private void buttonKorzinkaManuDescriptionSubcatOptimusPrime_Click(object sender, EventArgs e)
         {
+            buttonOptimusManuTransGaysOformitManuZakaz.Visible = true;
             sales.Clear();
             cardList.Clear();
             OutSales();
         }
 
+        // метод-обрабочик события при нажатии на кнопку "Оформить заказ"
+        private void buttonOptimusManuTransGaysOformitManuZakaz_Click(object sender, EventArgs e)
+        {
+            AddOrdersCardInDataBaseOptimusGangManu();
+            MessageBox.Show("Заказ успешно оформлён", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            abstractClassSales.Clear();
+            sales.Clear();
+            cardList.Clear();
+            CountSales();
+            OutProd();
+        }
 
+        // метод, который записывает информацию о заказе в БД
+        public void AddOrdersCardInDataBaseOptimusGangManu()
+        {
+            try
+            {
+                int nomerZakaza = 0;
+                var con = new NpgsqlConnection(Resources.conn);
+                con.Open();
+                var sql = @"SELECT MAX(num_of_order)
+	                            FROM public.orders;";
+                var cmd = new NpgsqlCommand(sql, con);
+                nomerZakaza = (int)cmd.ExecuteScalar() + 1; //ну здесь подумайте сами
+                con.Close();
+                con.Open();
+                var trans = con.BeginTransaction();// поясню на парах
+                var sql1 = @"INSERT INTO public.orders(
+	                            num_of_order, start_date, user_id, cat_id, prod_id, manu_id, size_id, quantity, price_unit)
+	                            VALUES (
+                                @nomerzak,
+	                            @date, 
+	                            @user, 
+	                            (select d_cat.id from d_cat where d_cat.title = @cat), 
+	                            @prodid, 
+	                            (select d_manu.id from d_manu where d_manu.title = @manu), 
+	                            (select d_size.id from d_size where d_size.title = @size),
+	                            @quan,
+	                            @price);";
+                var cmd1 = new NpgsqlCommand(sql1, con, trans);
 
+                foreach (CardUserControl prodsales in flowLayoutPanel3.Controls) //вытягиваем данные из динамического контейнера(потому что он тоже массив)
+                {
+                    cmd1.Parameters.Clear();
+                    cmd1.Parameters.AddWithValue("nomerzak", nomerZakaza);
+                    cmd1.Parameters.AddWithValue("date", DateTime.UtcNow); // время сейчас с опереционной системы
+                    cmd1.Parameters.AddWithValue("user", id_user);
+                    cmd1.Parameters.AddWithValue("cat", prodsales.cat);
+                    cmd1.Parameters.AddWithValue("prodid", prodsales.id);
+                    cmd1.Parameters.AddWithValue("manu", prodsales.manu);
+                    cmd1.Parameters.AddWithValue("size", prodsales.Sizes);
+                    cmd1.Parameters.AddWithValue("quan", prodsales.Quant);
+                    cmd1.Parameters.AddWithValue("price", prodsales.price2 * prodsales.Quant); // перемножаем цену на количество
+                    cmd1.ExecuteNonQuery();
+                }
+                trans.Commit(); // поясню на парах
+            }
+            catch (PostgresException ex)
+            {
+                MessageBox.Show($"Внимание вы превысили лимит количество товаров на складе, проверьте заказ{ex.Message}", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка подключение к бд{ex.Message}", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error); ;
+                return;
+            }
+        }
 
+        // Сохраняем в List товары, которые пользователь отметил для добавления в корзину 
+        public void ItemsInCart(AbstractClassSales sales)
+        {
+            abstractClassSales.Add(sales);
+        }
+
+        // метод, который выводит данные во flowLayoutPanel о товарах, которые пользователь добавил в корзину
         public void OutSales()
         {
             flowLayoutPanel3.Controls.Clear();
-            List<UC_Card> cards = Prod();
+            List<CardUserControl> cards = Prod();
             for (int i = 0; i < abstractClassSales.Count; i++)
             {
-                foreach (UC_Card product in cards)
+                foreach (CardUserControl product in cards)
                 {
                     if (product.id == abstractClassSales[i].idProd)
-                    { 
-                        UC_Card salescard = new UC_Card()
+                    {
+                        CardUserControl salescard = new CardUserControl()
                         {
                             id = product.id,
                             name = product.name,
@@ -74,22 +169,25 @@ namespace WindowsFormsApp1
                 }
             }
         }
-        public void SetSizeAndQuant(AbstractClassSales sales)
-        { 
-            abstractClassSales.Add(sales);
-        }
 
 
+
+        //  ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ВЫВОД КАРТОЧЕК ИЗ БД ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+
+
+
+        //метод, который будет вызываться при нажатии кнопки "Вывести товары". Нужен для удобства, как по мне) если вам удобно без него, можете убрать)
         private void refresh()
         {
             GetSales();
             OutProd();
             LoadDateCBCat();
+
+            comboBox1.SelectedIndex = 0;
+            comboBox2.SelectedIndex = 0;
         }
 
-
-
-        //получение скидок
+        // получение скидок
         private void GetSales()
         {
             sales.Clear();
@@ -114,27 +212,30 @@ namespace WindowsFormsApp1
             }
         }
 
-
-
-        //метод вывода карточк
+        // метод вывода карточек
         public void OutProd()
         {
+            buttonOptimusManuTransGaysOformitManuZakaz.Visible = false;
+
+            List<CardUserControl> cards = Prod();
+
+            flowLayoutPanel3.SuspendLayout();
 
             flowLayoutPanel3.Controls.Clear();
-            List<UC_Card> cards = Prod();
-            foreach (UC_Card product in cards)
+
+            foreach (CardUserControl product in cards)
             {
                 flowLayoutPanel3.Controls.Add(product);
             }
 
+            flowLayoutPanel3.ResumeLayout();
         }
 
-
-
-
-        //метод, который получает карты из бд
-        private List<UC_Card> Prod()
+        // метод, который получает карты из бд
+        private List<CardUserControl> Prod()
         {
+
+            cardList.Clear();
 
             using (var conn = new NpgsqlConnection(Resources.conn))
             {
@@ -148,7 +249,8 @@ namespace WindowsFormsApp1
                     JOIN public.d_manu ON d_manu.id = prod.manu_id
                     JOIN public.stock  ON stock.prod_id = prod.id_dubl
 					join public.d_scat ON d_scat.id = prod.scat_id
-                    GROUP BY id_dubl, d_cat.title, image, prod.title, d_manu.title, consist, price, prod.description, d_scat.title", conn))
+                    GROUP BY id_dubl, d_cat.title, image, prod.title, d_manu.title, consist, price, prod.description, d_scat.title
+order by prod.id_dubl", conn))
                 using (var rez = cmd.ExecuteReader())
                 {
                     while (rez.Read())
@@ -157,7 +259,7 @@ namespace WindowsFormsApp1
                         var issales = sales.Contains(id);
                         var price = rez.GetDecimal(6);
 
-                        var card1 = new UC_Card
+                        var card1 = new CardUserControl
                         {
                             id = id,
                             cat = rez.GetString(1),
@@ -179,9 +281,7 @@ namespace WindowsFormsApp1
             return cardList;
         }
 
-
-
-        //получение товара по кнопке
+        // получение товара по кнопке
         private void button1_Click(object sender, System.EventArgs e)
         {
             NpgsqlConnection.ClearAllPools();
@@ -189,7 +289,12 @@ namespace WindowsFormsApp1
         }
 
 
-        //подгрузка данных в комбобокс
+
+        //  ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ПОИСКОВИК ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ 
+
+
+
+        // подгрузка данных в комбобокс - категории
         private void LoadDateCBCat()
         {
 
@@ -215,12 +320,12 @@ namespace WindowsFormsApp1
             }
         }
 
-        //поисковик
+        // поисковик
         private void SearchFiltersAndSorting()
         {
             string searchText = textBox1.Text.Trim().ToLower();
             flowLayoutPanel3.SuspendLayout();
-            foreach (var card in flowLayoutPanel3.Controls.OfType<UC_Card>())
+            foreach (var card in flowLayoutPanel3.Controls.OfType<CardUserControl>())
             {
 
                 bool matchesSearch = string.IsNullOrEmpty(searchText) ||
@@ -232,15 +337,19 @@ namespace WindowsFormsApp1
             }
             if (comboBox1.SelectedIndex >= 0)
             {
-                var allCards = flowLayoutPanel3.Controls.Cast<UC_Card>().ToList();
+                var allCards = flowLayoutPanel3.Controls.Cast<CardUserControl>().ToList();
 
-                if (comboBox1.SelectedIndex == 1)
+                if (comboBox1.SelectedIndex == 2)
                 {
                     allCards = allCards.OrderByDescending(c => c.price2).ToList();
                 }
-                else
+                else if (comboBox1.SelectedIndex == 1)
                 {
                     allCards = allCards.OrderBy(c => c.price2).ToList();
+                }
+                else
+                {
+                    allCards = allCards.OrderBy(c => c.id).ToList();
                 }
 
                 for (int i = 0; i < allCards.Count; i++)
@@ -251,20 +360,30 @@ namespace WindowsFormsApp1
             flowLayoutPanel3.ResumeLayout();
         }
 
-        private void comboBox1_SelectedIndexChanged_1(object sender, EventArgs e)
-        {
-            Sort = comboBox1.SelectedIndex == -1 ? "" : comboBox1.Text;
-            SearchFiltersAndSorting();
-        }
-
+        // событие, когда вы выбираем что-то из категории
         private void comboBox2_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             Cat = comboBox2.SelectedIndex == 0 ? "" : comboBox2.Text;
             SearchFiltersAndSorting();
         }
 
+        // событие, когда вы изменяем (набираем) текст в текстовом поле
         private void textBox1_TextChanged_1(object sender, EventArgs e) => SearchFiltersAndSorting();
 
-       
+        // событие, когда вы выбираем что-то из сортивки по цене
+        private void comboBox1_SelectedIndexChanged_1(object sender, EventArgs e) => SearchFiltersAndSorting();
+
+
+        //----------------------------------------------------------------------------------------------------
+
+
+        // выход на авторизацию
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Hide();
+            var start = new AuthorizationForm();
+            start.ShowDialog();
+            Dispose();
+        }
     }
 }
