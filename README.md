@@ -1,4 +1,4 @@
-##**__поменять запрос по логике скидки__**
+##поменять запрос по логике скидки
 
 <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/327a1650-e6c0-4c57-8e61-4e0f4237b909" />
 
