@@ -1,6 +1,6 @@
 ### поменять запрос по логике скидки
 
-# Триггеры на таблицы
+# Триггер на таблицы
 <img width="651" height="837" alt="image" src="https://github.com/user-attachments/assets/a4681299-76af-4bed-903f-cf283068f76d" />
 
 # Код триггера
