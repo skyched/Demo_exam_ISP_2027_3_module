@@ -10,8 +10,10 @@ namespace WindowsFormsApp1
     public partial class AddForm : Form
     {
         public int idProd;
-        List<int> quantity = new List<int>();
-        public AddForm(UC_Card cards)
+
+        List<int> quantity = new List<int>(); // тут будут храниться размеры (метод GetSizeANDQuan())
+
+        public AddForm(CardUserControl cards)
         {
             InitializeComponent();
             this.idProd = cards.id;
@@ -24,16 +26,18 @@ namespace WindowsFormsApp1
             labelPrice.Text = "Цена: " + Decimal.Round(cards.price2, 2).ToString() + " руб.";
             pictureBox1.ImageLocation = Path.Combine(Application.StartupPath, @"../../Properties/Images", cards.image);
             labelWarning.Visible = false;
-            SetSize();
+            GetSizeANDQuan();
         }
-        public void SetSize()
+
+        // получение размеров и количество доступных размеров
+        public void GetSizeANDQuan()
         {
             var con = new NpgsqlConnection(Resources.conn);
             con.Open();
             string sql = $@"SELECT d_size.title, quantity_availabe
-	FROM public.stock
-	join public.d_size ON d_size.id = stock.size_id
-	where prod_id = {idProd}";
+	                            FROM public.stock
+	                            join public.d_size ON d_size.id = stock.size_id
+	                            where prod_id = {idProd}";
             var cmd = new NpgsqlCommand(sql, con);
             var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -43,6 +47,7 @@ namespace WindowsFormsApp1
             }
         }
 
+        // логика с максимальным значением numericUpDown
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox1.SelectedIndex >= 0)
@@ -52,6 +57,7 @@ namespace WindowsFormsApp1
             }
         }
 
+        // логика с максимальным значением numericUpDown 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             if (numericUpDown1.Value == numericUpDown1.Maximum)
@@ -65,13 +71,20 @@ namespace WindowsFormsApp1
             }
         }
 
+        // метод добавления товара в корзину с определенным размеров и кол-вом
         private void button2_Click(object sender, EventArgs e)
         {
             AbstractClassSales abstractClassSales = new AbstractClassSales(idProd, Convert.ToInt32(numericUpDown1.Value), Convert.ToString(comboBox1.SelectedItem));
             MainForm mainForm = (MainForm)Application.OpenForms["MainForm"];
-            mainForm.SetSizeAndQuant(abstractClassSales);
+            mainForm.ItemsInCart(abstractClassSales);
             mainForm.CountSales();
             MessageBox.Show($"Товар успешно добавлен в размере {comboBox1.SelectedItem} в количестве {numericUpDown1.Value} ", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            this.Close();
+        }
+
+        // метод закрытия формы
+        private void button1_Click(object sender, EventArgs e)
+        {
             this.Close();
         }
     }
