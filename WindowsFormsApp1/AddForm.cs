@@ -62,7 +62,7 @@ namespace WindowsFormsApp1
                     numericUpDown1.Enabled = false;
                     
                     labelWarning.Visible = true;
-                    labelWarning.Text = $"Размер этого товара закончился.";
+                    labelWarning.Text = $"Выбранный размер закончился.";
                 }
                 else
                 {
