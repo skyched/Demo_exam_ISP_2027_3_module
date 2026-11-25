@@ -52,18 +52,37 @@ namespace WindowsFormsApp1
         {
             if (comboBox1.SelectedIndex >= 0)
             {
-                numericUpDown1.Maximum = quantity[comboBox1.SelectedIndex];
-                numericUpDown1.Value = 0;
+                int available = quantity[comboBox1.SelectedIndex];
+
+                numericUpDown1.Maximum = available;
+
+                if (available == 0)
+                {
+                    button2.Enabled = false;
+                    numericUpDown1.Enabled = false;
+                    
+                    labelWarning.Visible = true;
+                    labelWarning.Text = $"Размер этого товара закончился.";
+                }
+                else
+                {
+                    button2.Enabled = true;
+                    numericUpDown1.Enabled = true;
+                    numericUpDown1.Value = 0;
+
+                    labelWarning.Visible = false;
+                }
             }
         }
 
         // логика с максимальным значением numericUpDown 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
+
             if (numericUpDown1.Value == numericUpDown1.Maximum)
             {
                 labelWarning.Visible = true;
-                labelWarning.Text = $"Количество товаров на складе {numericUpDown1.Maximum}";
+                labelWarning.Text = $"Количество товаров на складе: {numericUpDown1.Maximum}.";
             }
             else if (numericUpDown1.Value < numericUpDown1.Maximum)
             {
@@ -78,7 +97,7 @@ namespace WindowsFormsApp1
             MainForm mainForm = (MainForm)Application.OpenForms["MainForm"];
             mainForm.ItemsInCart(abstractClassSales);
             mainForm.CountSales();
-            MessageBox.Show($"Товар успешно добавлен в размере {comboBox1.SelectedItem} в количестве {numericUpDown1.Value} ", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show($"Товар успешно добавлен в размере {comboBox1.SelectedItem} в количестве {numericUpDown1.Value}.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Close();
         }
 
