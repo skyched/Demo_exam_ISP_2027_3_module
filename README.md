@@ -9,6 +9,6 @@
 
 # Ограничение на таблицу stock
 <img width="600" height="400" alt="image" src="https://github.com/user-attachments/assets/152ffa7f-0466-497f-b9e6-fbb47828398d" />
-<img width="600" height="400" alt="image" src="https://github.com/user-attachments/assets/8f46648b-20c3-4797-930f-f882113970f4" />
+<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/8f46648b-20c3-4797-930f-f882113970f4" />
 
 
