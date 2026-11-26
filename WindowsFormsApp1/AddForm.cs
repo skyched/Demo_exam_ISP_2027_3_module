@@ -68,7 +68,7 @@ namespace WindowsFormsApp1
                 {
                     button2.Enabled = true;
                     numericUpDown1.Enabled = true;
-                    numericUpDown1.Value = 1;
+                    numericUpDown1.Value = 0;
 
                     labelWarning.Visible = false;
                 }
