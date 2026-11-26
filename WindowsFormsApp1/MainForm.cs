@@ -160,6 +160,7 @@ namespace WindowsFormsApp1
                             subcat = product.subcat,
                             price2 = product.price2,
                             image = product.image,
+                            totalquan = product.totalquan,
                         };
                         salescard.SetMode(abstractClassSales[i].Sizes, abstractClassSales[i].Quantity);
                         salescard.SetLabel();
