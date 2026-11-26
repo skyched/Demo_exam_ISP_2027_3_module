@@ -14,7 +14,7 @@ namespace WindowsFormsApp1
             button2.Visible = false;
         }
 
-        
+
         public int id;
         public string cat;
         public string image;
@@ -38,6 +38,7 @@ namespace WindowsFormsApp1
             button2.Visible = true;
             labelRazmer.Text = "Размер: " + size;
             labelColvo.Text = "Количество: " + quant.ToString();
+            label3.Text = "Количество ограничено.";
             this.Sizes = size;
             this.Quant = quant;
         }
@@ -50,7 +51,14 @@ namespace WindowsFormsApp1
 
             label2.Text = "Категория: " + cat;
 
-            label3.Text = totalquan >= 5 ? "Количество: много" : "Количество: мало";
+            if (totalquan == 0)
+            {
+
+            }
+            else
+            {
+                label3.Text = totalquan >= 5 ? "Количество: много" : "Количество: мало";
+            }
 
             label4.Text = "Состав: " + consist;
 
@@ -73,7 +81,12 @@ namespace WindowsFormsApp1
                 label6.Text = $"Скидка 25%: {price2} руб.";
             }
 
-            if (totalquan <= 3)
+            if (totalquan == 0)
+            {
+                this.BackColor = Color.White;
+            }
+
+            else if (totalquan <= 3)
             {
                 this.BackColor = Color.LightPink;
             }
