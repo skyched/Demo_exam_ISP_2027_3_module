@@ -80,7 +80,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(170, 59);
             this.button1.TabIndex = 5;
-            this.button1.Text = "Вывести товары";
+            this.button1.Text = "Вывести/обновить товары";
             this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -135,7 +135,7 @@
             this.buttonBasket.Name = "buttonBasket";
             this.buttonBasket.Size = new System.Drawing.Size(170, 59);
             this.buttonBasket.TabIndex = 9;
-            this.buttonBasket.Text = "Открыть корзину";
+            this.buttonBasket.Text = "Открыть/обновить корзину";
             this.buttonBasket.UseVisualStyleBackColor = false;
             this.buttonBasket.Click += new System.EventHandler(this.buttonBasket_Click);
             // 
