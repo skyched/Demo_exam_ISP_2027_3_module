@@ -25,7 +25,6 @@ namespace WindowsFormsApp1
             labelPodcat.Text = "Подкатегория: " + cards.subcat;
             labelPrice.Text = "Цена: " + Decimal.Round(cards.price2, 2).ToString() + " руб.";
             pictureBox1.ImageLocation = Path.Combine(Application.StartupPath, @"../../Properties/Images", cards.image);
-            labelWarning.Visible = false;
             GetSizeANDQuan();
         }
 
@@ -55,50 +54,54 @@ namespace WindowsFormsApp1
                 int available = quantity[comboBox1.SelectedIndex];
 
                 numericUpDown1.Maximum = available;
-
-                if (available == 0)
-                {
-                    button2.Enabled = false;
-                    numericUpDown1.Enabled = false;
-                    
-                    labelWarning.Visible = true;
-                    labelWarning.Text = $"Выбранный размер закончился.";
-                }
-                else
-                {
-                    button2.Enabled = true;
-                    numericUpDown1.Enabled = true;
-                    numericUpDown1.Value = 0;
-
-                    labelWarning.Visible = false;
-                }
+                numericUpDown1.Value = 0;
+                button2.Enabled = true;
+                labelWarning.Text = $"Количество товаров на складе: {numericUpDown1.Maximum}.";
             }
         }
 
-        // логика с максимальным значением numericUpDown 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        // проверка и добавление товара в корзину
+        public void CheckTovar()
         {
-
-            if (numericUpDown1.Value == numericUpDown1.Maximum)
+            if (comboBox1.SelectedIndex == -1 && numericUpDown1.Value == 0)
             {
-                labelWarning.Visible = true;
-                labelWarning.Text = $"Количество товаров на складе: {numericUpDown1.Maximum}.";
+                MessageBox.Show("Пожалуйста, выберите размер и количество, доступное для заказа.",
+                    "Информация", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
-            else if (numericUpDown1.Value < numericUpDown1.Maximum)
+            else if (quantity[comboBox1.SelectedIndex] == 0)
             {
-                labelWarning.Visible = false;
+                MessageBox.Show("Выбранный размер данного товара закончился, пожалуйстa, выберите другой размер.",
+                    "Информация", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else if (quantity[comboBox1.SelectedIndex] > 0 && numericUpDown1.Value == 0)
+            {
+                MessageBox.Show("Пожалуйста, выберите размер и количество, доступное для заказа",
+                   "Информация", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else
+            {
+                AbstractClassSales abstractClassSales = new AbstractClassSales(idProd, Convert.ToInt32(numericUpDown1.Value), Convert.ToString(comboBox1.SelectedItem));
+                foreach (var item in Application.OpenForms)
+                {
+                    if (item is MainForm main)
+                    {
+                        main.ItemsInCart(abstractClassSales);
+                        main.CountSales();
+                        MessageBox.Show($"Товар добавлен в корзину: размер {comboBox1.SelectedItem}, количество — {numericUpDown1.Value} шт.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        this.Close();
+                        break;
+                    }
+                }
             }
         }
 
         // метод добавления товара в корзину с определенным размеров и кол-вом
         private void button2_Click(object sender, EventArgs e)
         {
-            AbstractClassSales abstractClassSales = new AbstractClassSales(idProd, Convert.ToInt32(numericUpDown1.Value), Convert.ToString(comboBox1.SelectedItem));
-            MainForm mainForm = (MainForm)Application.OpenForms["MainForm"];
-            mainForm.ItemsInCart(abstractClassSales);
-            mainForm.CountSales();
-            MessageBox.Show($"Товар успешно добавлен в размере {comboBox1.SelectedItem} в количестве {numericUpDown1.Value}.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            this.Close();
+            CheckTovar();
         }
 
         // метод закрытия формы

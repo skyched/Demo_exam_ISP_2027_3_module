@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Windows.Forms;
 using WindowsFormsApp1.Properties;
 
@@ -30,7 +29,7 @@ namespace WindowsFormsApp1
             this.id_user = id;
             label4.Text = "Здравствуйте, " + user + "!";
             labelShowCount.Visible = false;
-            buttonOptimusManuTransGaysOformitManuZakaz.Visible = false;
+            buttonOrderConfirm.Visible = false;
         }
 
         //----------------------------------------------------------------------------------------------------
@@ -54,20 +53,34 @@ namespace WindowsFormsApp1
             }
         }
 
-        // метод-обрабочик события при нажатии на кнопку "Открыть корзину"
-        private void buttonKorzinkaManuDescriptionSubcatOptimusPrime_Click(object sender, EventArgs e)
+        // метод проверки события
+        public void CheckSales()
         {
-            buttonOptimusManuTransGaysOformitManuZakaz.Visible = true;
-            sales.Clear();
-            cardList.Clear();
-            OutSales();
+            if (abstractClassSales.Count == 0)
+            {
+                buttonOrderConfirm.Visible = false;
+                OutSales();
+                return;
+            }
+            else
+            {
+                buttonOrderConfirm.Visible = true;
+                sales.Clear();
+                cardList.Clear();
+                OutSales();
+            }
+        }
+
+        // метод-обрабочик события при нажатии на кнопку "Открыть корзину"
+        private void buttonBasket_Click(object sender, EventArgs e)
+        {
+            CheckSales();
         }
 
         // метод-обрабочик события при нажатии на кнопку "Оформить заказ"
-        private void buttonOptimusManuTransGaysOformitManuZakaz_Click(object sender, EventArgs e)
+        private void buttonOrderConfirm_Click(object sender, EventArgs e)
         {
-            AddOrdersCardInDataBaseOptimusGangManu();
-            MessageBox.Show("Заказ успешно оформлён", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            InsertInfoOrderInDB();
             abstractClassSales.Clear();
             sales.Clear();
             cardList.Clear();
@@ -76,58 +89,67 @@ namespace WindowsFormsApp1
         }
 
         // метод, который записывает информацию о заказе в БД
-        public void AddOrdersCardInDataBaseOptimusGangManu()
+        public void InsertInfoOrderInDB()
         {
             try
             {
                 int nomerZakaza = 0;
-                var con = new NpgsqlConnection(Resources.conn);
-                con.Open();
-                var sql = @"SELECT MAX(num_of_order)
-	                            FROM public.orders;";
-                var cmd = new NpgsqlCommand(sql, con);
-                nomerZakaza = (int)cmd.ExecuteScalar() + 1; //ну здесь подумайте сами
-                con.Close();
-                con.Open();
-                var trans = con.BeginTransaction();// поясню на парах
-                var sql1 = @"INSERT INTO public.orders(
-	                            num_of_order, start_date, user_id, cat_id, prod_id, manu_id, size_id, quantity, price_unit)
-	                            VALUES (
-                                @nomerzak,
-	                            @date, 
-	                            @user, 
-	                            (select d_cat.id from d_cat where d_cat.title = @cat), 
-	                            @prodid, 
-	                            (select d_manu.id from d_manu where d_manu.title = @manu), 
-	                            (select d_size.id from d_size where d_size.title = @size),
-	                            @quan,
-	                            @price);";
-                var cmd1 = new NpgsqlCommand(sql1, con, trans);
 
-                foreach (CardUserControl prodsales in flowLayoutPanel3.Controls) //вытягиваем данные из динамического контейнера(потому что он тоже массив)
+                using (var con = new NpgsqlConnection(Resources.conn))
                 {
-                    cmd1.Parameters.Clear();
-                    cmd1.Parameters.AddWithValue("nomerzak", nomerZakaza);
-                    cmd1.Parameters.AddWithValue("date", DateTime.UtcNow); // время сейчас с опереционной системы
-                    cmd1.Parameters.AddWithValue("user", id_user);
-                    cmd1.Parameters.AddWithValue("cat", prodsales.cat);
-                    cmd1.Parameters.AddWithValue("prodid", prodsales.id);
-                    cmd1.Parameters.AddWithValue("manu", prodsales.manu);
-                    cmd1.Parameters.AddWithValue("size", prodsales.Sizes);
-                    cmd1.Parameters.AddWithValue("quan", prodsales.Quant);
-                    cmd1.Parameters.AddWithValue("price", prodsales.price2 * prodsales.Quant); // перемножаем цену на количество
-                    cmd1.ExecuteNonQuery();
+                    con.Open();
+                    var sql = @"SELECT MAX(num_of_order)
+                            FROM public.orders;";
+                    using (var cmd = new NpgsqlCommand(sql, con))
+                    {
+                        nomerZakaza = (int)cmd.ExecuteScalar() + 1; //ну здесь подумайте сами
+                    }
+
+                    using (var trans = con.BeginTransaction()) // поясню на парах
+                    {
+                        var sql1 = @"INSERT INTO public.orders(
+                                num_of_order, start_date, user_id, cat_id, prod_id, manu_id, size_id, quantity, price_unit)
+                                VALUES (
+                                @nomerzak,
+                                @date, 
+                                @user, 
+                                (select d_cat.id from d_cat where d_cat.title = @cat), 
+                                @prodid, 
+                                (select d_manu.id from d_manu where d_manu.title = @manu), 
+                                (select d_size.id from d_size where d_size.title = @size),
+                                @quan,
+                                @price);";
+                        using (var cmd1 = new NpgsqlCommand(sql1, con, trans))
+                        {
+                            foreach (CardUserControl prodsales in flowLayoutPanel3.Controls) //вытягиваем данные из динамического контейнера(потому что он тоже массив)
+                            {
+                                cmd1.Parameters.Clear();
+                                cmd1.Parameters.AddWithValue("nomerzak", nomerZakaza);
+                                cmd1.Parameters.AddWithValue("date", DateTime.UtcNow); // время сейчас с опереционной системы
+                                cmd1.Parameters.AddWithValue("user", id_user);
+                                cmd1.Parameters.AddWithValue("cat", prodsales.cat);
+                                cmd1.Parameters.AddWithValue("prodid", prodsales.id);
+                                cmd1.Parameters.AddWithValue("manu", prodsales.manu);
+                                cmd1.Parameters.AddWithValue("size", prodsales.Sizes);
+                                cmd1.Parameters.AddWithValue("quan", prodsales.Quant);
+                                cmd1.Parameters.AddWithValue("price", prodsales.price2 * prodsales.Quant); // ВАЖНО! В БД УКАЗЫВАЕСЯ ЦЕНА ЗА ЕДИНИЦУ, НО ТУТ МЫ ПЕРЕМНОЖАЕМ
+                                                                                                           // В ЦЕЛОМ, ЭТО ЛОГИЧНО, НО СТОИТ УТОЧНИТЬ.
+                                cmd1.ExecuteNonQuery();
+                            }
+                        }
+                        trans.Commit(); // поясню на парах
+                        MessageBox.Show("Заказ успешно оформлен.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
-                trans.Commit(); // поясню на парах
             }
             catch (PostgresException ex)
             {
-                MessageBox.Show($"Внимание вы превысили лимит количество товаров на складе, проверьте заказ{ex.Message}", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Внимание! Вы превысили лимит доступного количества товаров на складе, пожалуйста, проверьте заказ.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка подключение к бд{ex.Message}", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error); ;
+                MessageBox.Show($"Ошибка подключение к БД: {ex.Message}", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
         }
@@ -198,13 +220,13 @@ namespace WindowsFormsApp1
                 conn.Open();
 
                 using (var cmd = new NpgsqlCommand(@"
-                    SELECT prod_id FROM public.orders
-                    WHERE date_trunc('month', start_date) =
-                          (SELECT date_trunc('month', max(start_date)) FROM orders)
-                    EXCEPT
-                    SELECT prod_id FROM public.orders
-                    WHERE date_trunc('month', start_date) =
-                          (SELECT date_trunc('month', max(start_date)) - interval '1 month' FROM orders)", conn))
+                    select id_dubl 
+                    from prod
+                    except
+                    SELECT orders.prod_id
+                     FROM public.orders
+                     where date_trunc('month', start_date) =
+                     (select date_trunc('month', max(start_date)) - interval '1 month' from orders)", conn))
                 using (var rez = cmd.ExecuteReader())
                 {
                     while (rez.Read())
@@ -216,7 +238,7 @@ namespace WindowsFormsApp1
         // метод вывода карточек
         public void OutProd()
         {
-            buttonOptimusManuTransGaysOformitManuZakaz.Visible = false;
+            buttonOrderConfirm.Visible = false;
 
             List<CardUserControl> cards = Prod();
 
@@ -381,10 +403,7 @@ order by prod.id_dubl", conn))
         // выход на авторизацию
         private void button2_Click(object sender, EventArgs e)
         {
-            Hide();
-            var start = new AuthorizationForm();
-            start.ShowDialog();
-            Dispose();
+            Application.Restart();
         }
     }
 }

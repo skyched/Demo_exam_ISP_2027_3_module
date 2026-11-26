@@ -171,7 +171,6 @@
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(44, 32);
             this.numericUpDown1.TabIndex = 18;
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label1
             // 
@@ -199,9 +198,9 @@
             this.labelWarning.ForeColor = System.Drawing.Color.Red;
             this.labelWarning.Location = new System.Drawing.Point(15, 631);
             this.labelWarning.Name = "labelWarning";
-            this.labelWarning.Size = new System.Drawing.Size(106, 15);
+            this.labelWarning.Size = new System.Drawing.Size(182, 15);
             this.labelWarning.TabIndex = 21;
-            this.labelWarning.Text = "Выберите размер";
+            this.labelWarning.Text = "Выберите размер и количество";
             // 
             // AddForm
             // 

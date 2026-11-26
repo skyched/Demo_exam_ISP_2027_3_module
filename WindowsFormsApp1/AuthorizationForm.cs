@@ -41,14 +41,13 @@ namespace WindowsFormsApp1
                     {
                         if (rez.Read())
                         {
-                            Hide();
                             var mainform = new MainForm(rez.GetInt32(0), rez.GetString(1)); //передаем параметры
+                            this.Hide();
                             mainform.ShowDialog();
-                            Dispose();
                         }
                         else
                         {
-                            MessageBox.Show("Пользователь не найден.\n\nЛибо Вы не заполнили поле.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Пользователь не найден.\n\nЛибо Вы не заполнили поле.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }

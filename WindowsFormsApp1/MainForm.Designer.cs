@@ -37,9 +37,9 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime = new System.Windows.Forms.Button();
+            this.buttonBasket = new System.Windows.Forms.Button();
             this.labelShowCount = new System.Windows.Forms.Label();
-            this.buttonOptimusManuTransGaysOformitManuZakaz = new System.Windows.Forms.Button();
+            this.buttonOrderConfirm = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -127,17 +127,17 @@
             this.comboBox2.TabIndex = 8;
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged_1);
             // 
-            // buttonKorzinkaManuDescriptionSubcatOptimusPrime
+            // buttonBasket
             // 
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(178)))), ((int)(((byte)(175)))));
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.Location = new System.Drawing.Point(23, 495);
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.Name = "buttonKorzinkaManuDescriptionSubcatOptimusPrime";
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.Size = new System.Drawing.Size(170, 59);
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.TabIndex = 9;
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.Text = "Открыть корзину";
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.UseVisualStyleBackColor = false;
-            this.buttonKorzinkaManuDescriptionSubcatOptimusPrime.Click += new System.EventHandler(this.buttonKorzinkaManuDescriptionSubcatOptimusPrime_Click);
+            this.buttonBasket.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(178)))), ((int)(((byte)(175)))));
+            this.buttonBasket.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.buttonBasket.Location = new System.Drawing.Point(23, 495);
+            this.buttonBasket.Name = "buttonBasket";
+            this.buttonBasket.Size = new System.Drawing.Size(170, 59);
+            this.buttonBasket.TabIndex = 9;
+            this.buttonBasket.Text = "Открыть корзину";
+            this.buttonBasket.UseVisualStyleBackColor = false;
+            this.buttonBasket.Click += new System.EventHandler(this.buttonBasket_Click);
             // 
             // labelShowCount
             // 
@@ -150,17 +150,17 @@
             this.labelShowCount.TabIndex = 10;
             this.labelShowCount.Text = "()";
             // 
-            // buttonOptimusManuTransGaysOformitManuZakaz
+            // buttonOrderConfirm
             // 
-            this.buttonOptimusManuTransGaysOformitManuZakaz.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(178)))), ((int)(((byte)(175)))));
-            this.buttonOptimusManuTransGaysOformitManuZakaz.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.buttonOptimusManuTransGaysOformitManuZakaz.Location = new System.Drawing.Point(23, 430);
-            this.buttonOptimusManuTransGaysOformitManuZakaz.Name = "buttonOptimusManuTransGaysOformitManuZakaz";
-            this.buttonOptimusManuTransGaysOformitManuZakaz.Size = new System.Drawing.Size(170, 59);
-            this.buttonOptimusManuTransGaysOformitManuZakaz.TabIndex = 11;
-            this.buttonOptimusManuTransGaysOformitManuZakaz.Text = "Оформить заказ";
-            this.buttonOptimusManuTransGaysOformitManuZakaz.UseVisualStyleBackColor = false;
-            this.buttonOptimusManuTransGaysOformitManuZakaz.Click += new System.EventHandler(this.buttonOptimusManuTransGaysOformitManuZakaz_Click);
+            this.buttonOrderConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(178)))), ((int)(((byte)(175)))));
+            this.buttonOrderConfirm.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.buttonOrderConfirm.Location = new System.Drawing.Point(23, 430);
+            this.buttonOrderConfirm.Name = "buttonOrderConfirm";
+            this.buttonOrderConfirm.Size = new System.Drawing.Size(170, 59);
+            this.buttonOrderConfirm.TabIndex = 11;
+            this.buttonOrderConfirm.Text = "Оформить заказ";
+            this.buttonOrderConfirm.UseVisualStyleBackColor = false;
+            this.buttonOrderConfirm.Click += new System.EventHandler(this.buttonOrderConfirm_Click);
             // 
             // label1
             // 
@@ -227,8 +227,8 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.buttonKorzinkaManuDescriptionSubcatOptimusPrime);
-            this.Controls.Add(this.buttonOptimusManuTransGaysOformitManuZakaz);
+            this.Controls.Add(this.buttonBasket);
+            this.Controls.Add(this.buttonOrderConfirm);
             this.Controls.Add(this.labelShowCount);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.comboBox1);
@@ -262,9 +262,9 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.Button buttonKorzinkaManuDescriptionSubcatOptimusPrime;
+        private System.Windows.Forms.Button buttonBasket;
         private System.Windows.Forms.Label labelShowCount;
-        private System.Windows.Forms.Button buttonOptimusManuTransGaysOformitManuZakaz;
+        private System.Windows.Forms.Button buttonOrderConfirm;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

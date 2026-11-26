@@ -14,7 +14,6 @@ namespace WindowsFormsApp1
             button2.Visible = false;
         }
 
-
         public int id;
         public string cat;
         public string image;
@@ -28,7 +27,6 @@ namespace WindowsFormsApp1
         public string subcat;
         public string Sizes;
         public int Quant;
-
 
         // метод для товаров, которые будут в корзине
         public void SetMode(string size, int quant)
@@ -75,7 +73,7 @@ namespace WindowsFormsApp1
 
             if (totalquan <= 3)
             {
-                this.BackColor = Color.LightPink;
+                this.BackColor = ColorTranslator.FromHtml("#FF8080");
             }
 
             pictureBox1.ImageLocation = Path.Combine(Application.StartupPath, "../../Properties/Images", image);
@@ -92,9 +90,13 @@ namespace WindowsFormsApp1
         private void button2_Click(object sender, System.EventArgs e)
         {
             MainForm mainForm = (MainForm)Application.OpenForms["MainForm"];
+
             mainForm.abstractClassSales.RemoveAt(this.Parent.Controls.IndexOf(this));
-            mainForm.CountSales();
+
             this.Parent.Controls.Remove(this);
+
+            mainForm.CountSales();
+            mainForm.CheckSales();
         }
     }
 }
