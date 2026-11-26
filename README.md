@@ -1,5 +1,5 @@
 # Триггер на таблицы
-<img width="600" height="400" alt="image" src="https://github.com/user-attachments/assets/a4681299-76af-4bed-903f-cf283068f76d" />
+<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/a4681299-76af-4bed-903f-cf283068f76d" />
 
 
 # Код триггера
