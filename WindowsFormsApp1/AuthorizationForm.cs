@@ -41,9 +41,22 @@ namespace WindowsFormsApp1
                     {
                         if (rez.Read())
                         {
+                            
                             var mainform = new MainForm(rez.GetInt32(0), rez.GetString(1)); //передаем параметры
+
                             this.Hide();
-                            mainform.ShowDialog();
+
+                            var result = mainform.ShowDialog();
+
+                            if (result == DialogResult.OK)
+                            {
+                                textBox1.Clear();
+                                this.Show();
+                            }
+                            else
+                            {
+                                this.Close();
+                            }
                         }
                         else
                         {
