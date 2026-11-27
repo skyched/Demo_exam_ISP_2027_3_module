@@ -403,7 +403,7 @@ order by prod.id_dubl", conn))
         // выход на авторизацию
         private void button2_Click(object sender, EventArgs e)
         {
-            Application.Restart();
+            this.DialogResult = DialogResult.OK;
         }
     }
 }
